@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import SunburstChart from './components/SunburstChart';
 import BubbleChart from './components/BubbleChart';
+import Heatmap from './components/Heatmap';
 import './App.css';
 
 const data = {
@@ -98,7 +99,6 @@ function App() {
       <main className="main-content">
         <section className="section" id="analysis">
           <div className="section-content">
-          
             <div className="chart-container">
               <SunburstChart data={data} onRegionClick={handleRegionClick} />
             </div>
@@ -112,14 +112,26 @@ function App() {
               ref={marketAnalysisRef} 
               style={{ scrollMarginTop: '100px' }}
             >
-             
+              Market Analysis
             </h2>
             <p className="section-description">
-              
+              Detailed insights into AI industry trends and computations.
             </p>
             <div className="chart-container">
               <BubbleChart />
             </div>
+          </div>
+        </section>
+
+        <section className="section" id="globe">
+          <div className="section-content">
+            <h2>Heatmap</h2>
+            <p className="section-description">
+              Explore AI trends across regions with our interactive globe.
+            </p>
+            <div className="chart-container">
+              <Heatmap />
+              </div>
           </div>
         </section>
       </main>

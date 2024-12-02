@@ -79,9 +79,9 @@ const BubbleChart = () => {
         ? domainDetails.slice(0, limit)
         : domainDetails.slice(-limit).reverse();
 
-    const barWidth = width / 2 - 100;
-    const barHeight = 20;
-    const chartHeight = filteredData.length * (barHeight + 5);
+        const barWidth = width / 2 - 140; // Increased left margin for longer text
+        const barHeight = 24; // Increased bar height
+        const chartHeight = filteredData.length * (barHeight + 8); // Increased spacing
 
     const xScale = d3
       .scaleLinear()
@@ -93,7 +93,8 @@ const BubbleChart = () => {
         {filteredData.map((d, i) => (
           <g
             key={i}
-            transform={`translate(100, ${i * (barHeight + 5) + 5})`}
+            transform={`translate(120, ${i * (barHeight + 8) + 8})`}
+            className="transition-all duration-200 hover:opacity-80"
           >
             <rect
               x="0"
@@ -101,23 +102,32 @@ const BubbleChart = () => {
               width={xScale(d.value)}
               height={barHeight}
               fill="#4ECDC4"
+              rx="2"
+              className="transition-all duration-200"
             />
             <text
-              x={-5}
+              x={-8}
               y={barHeight / 2}
               textAnchor="end"
               alignmentBaseline="middle"
               fill="#333"
-              fontSize="12px"
+              fontSize="13px"
+              className="font-medium"
+              style={{
+                maxWidth: "110px",
+                overflow: "hidden",
+                textOverflow: "ellipsis"
+              }}
             >
               {d.entity}
             </text>
             <text
-              x={xScale(d.value) + 5}
+              x={xScale(d.value) + 8}
               y={barHeight / 2}
               alignmentBaseline="middle"
               fill="#666"
-              fontSize="12px"
+              fontSize="13px"
+              className="font-medium"
             >
               {formatValue(d.value)}
             </text>
@@ -240,11 +250,11 @@ const BubbleChart = () => {
   {["top5", "least5"].map((type) => (
     <button
       key={type}
-      className={`px-4 py-2 rounded ${
-        filterType === type
-          ? "bg-blue-500 text-white"
-          : "bg-gray-200 text-gray-800"
-      }`}
+      className={`px-6 py-2 rounded-full font-medium text-sm transition-all duration-200 transform hover:scale-105 ${
+                  filterType === type
+                    ? "bg-blue-500 text-white shadow-md hover:bg-blue-600"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
       onClick={() => setFilterType(type)}
     >
       {type.replace(/(\d+)/, " $1").replace("top", "Top").replace("least", "Least")}
@@ -265,4 +275,3 @@ const BubbleChart = () => {
     };
     
     export default BubbleChart;
-    
