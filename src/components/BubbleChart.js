@@ -169,93 +169,181 @@ const BubbleChart = () => {
           </p>
 
           <div className="relative mb-6">
-            <svg width={width} height={height} className="mx-auto">
-              <g transform={`translate(20, 20)`}>
-                {root.leaves().map((leaf, i) => (
-                  <g
-                    key={i}
-                    transform={`translate(${leaf.x},${leaf.y})`}
-                    onMouseEnter={() => setHoveredDomain(leaf.data.domain)}
-                    onMouseLeave={() => setHoveredDomain(null)}
-                    onClick={() => handleDomainClick(leaf.data.domain)}
-                    className="cursor-pointer transition-all duration-200"
-                  >
-                    <circle
-                      r={leaf.r}
-                      fill="#FF6B6B"
-                      opacity={
-                        hoveredDomain === null || hoveredDomain === leaf.data.domain
-                          ? 0.8
-                          : 0.3
-                      }
-                      stroke="#fff"
-                      strokeWidth="1.5"
-                      style={{ cursor: "pointer", transition: "opacity 0.3s" }}
-                    >
-                      <title>{`${leaf.data.domain}: ${formatValue(
-                        leaf.data.value
-                      )} petaFLOP`}</title>
-                    </circle>
-                    {leaf.r > 30 && (
-                      <>
-                        <text
-                          textAnchor="middle"
-                          dy="-0.5em"
-                          fill="#333"
-                          style={{ fontSize: Math.min(leaf.r / 4, 16) }}
-                        >
-                          {leaf.data.domain}
-                        </text>
-                        <text
-                          textAnchor="middle"
-                          dy="1em"
-                          fill="#666"
-                          style={{ fontSize: Math.min(leaf.r / 5, 14) }}
-                        >
-                          {formatValue(leaf.data.value)}
-                        </text>
-                      </>
-                    )}
-                  </g>
-                ))}
-              </g>
-            </svg>
+          <svg width={width} height={height} className="mx-auto">
+  <g transform={`translate(20, 20)`}>
+    {root
+      .leaves()
+      .sort((a, b) => b.data.value - a.data.value) // Sort by value for display order
+      .map((leaf, i) => (
+        <g
+          key={i}
+          transform={`translate(${leaf.x},${leaf.y})`}
+          onMouseEnter={() => setHoveredDomain(leaf.data.domain)}
+          onMouseLeave={() => setHoveredDomain(null)}
+          onClick={() => handleDomainClick(leaf.data.domain)}
+          className="cursor-pointer transition-all duration-200"
+        >
+          <circle
+            r={0} // Start with radius 0 for animation
+            fill="#FF6B6B"
+            opacity={0} // Start with opacity 0 for fade-in animation
+            stroke="#fff"
+            strokeWidth="1.5"
+            style={{
+              cursor: "pointer",
+              transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
+              transform:
+                hoveredDomain === leaf.data.domain ? "scale(1.1)" : "scale(1)",
+              filter:
+                hoveredDomain === leaf.data.domain
+                  ? "drop-shadow(0px 0px 10px #FF6B6B)"
+                  : "none",
+            }}
+            ref={(el) => {
+              if (el) {
+                d3.select(el)
+                  .transition()
+                  .delay(i * 200) // Delay based on index
+                  .duration(800) // Animation duration
+                  .attr("r", leaf.r) // Animate radius to final value
+                  .attr("opacity", 0.8); // Fade-in effect
+              }
+            }}
+          >
+            <title>{`${leaf.data.domain}: ${formatValue(
+              leaf.data.value
+            )} petaFLOP`}</title>
+          </circle>
+          {leaf.r > 30 && (
+            <>
+              <text
+                textAnchor="middle"
+                dy="-0.5em"
+                fill="#333"
+                style={{ fontSize: Math.min(leaf.r / 4, 16) }}
+              >
+                {leaf.data.domain}
+              </text>
+              <text
+                textAnchor="middle"
+                dy="1em"
+                fill="#666"
+                style={{ fontSize: Math.min(leaf.r / 5, 14) }}
+              >
+                {formatValue(leaf.data.value)}
+              </text>
+            </>
+          )}
+        </g>
+      ))}
+  </g>
+</svg>
+
           </div>
         </div>
 
         {/* Bar Chart */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-bold mb-2 text-center text-gray-800">
-            {selectedDomain
-              ? `Entity Contributions in ${selectedDomain}`
-              : "Click a Domain"}
-          </h2>
-          <div className="flex justify-center gap-3 mb-4">
-            {[{ type: "top5", label: "Top 5", icon: "⬆️" }, { type: "least5", label: "Least 5", icon: "⬇️" }].map(
+        {/* Bar Chart */}
+
+
+
+
+
+        
+<div className="bg-white rounded-lg shadow-lg p-6 relative">
+  <div className="flex justify-between items-center">
+    <h2 className="text-xl font-bold mb-2 text-gray-800">
+      {selectedDomain
+        ? `Entity Contributions in ${selectedDomain}`
+        : "Click a Domain"}
+    </h2>
+    {selectedDomain && (
+  <button
+    onClick={() => {
+      setSelectedDomain(null);
+      setDomainDetails([]);
+    }}
+    style={{
+      padding: "5px 20px",
+      fontSize: "14px",
+      
+      color: "white",
+      background: "linear-gradient(to right, #FF6B6B, #FF4A4A)", // Red gradient
+      borderRadius: "20px",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+      border: "none",
+      cursor: "pointer",
+      position: "absolute", // Position the button
+      bottom: "16px", // From the bottom of the container
+      right: "16px", // From the right of the container
+      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+    }}
+    
+  >
+    Reset
+  </button>
+)}
+  </div>
+
+
+
+
+
+  <div className="flex justify-center gap-3 mb-4">
+            {[{ type: "top5", label: "Top 5" }, { type: "least5", label: "Least 5" }].map(
               ({ type, label, icon }) => (
                 <button
                   key={type}
-                  className={`flex items-center px-4 py-2 rounded-lg font-medium text-base transition-all duration-200 transform hover:scale-105 shadow-sm focus:outline-none ${
-                    filterType === type
-                      ? "bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-300"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-gray-300"
-                  }`}
                   onClick={() => setFilterType(type)}
+                  style={{
+                    padding: "5px 10px",
+                    fontSize: "14px",
+                    
+                    color: filterType === type ? "white" : "#FF6B6B",
+                    background: filterType === type
+                      ? "linear-gradient(to right, #FF6B6B, #FF4A4A)"
+                      : "white",
+                    borderRadius: "10px",
+                   
+                    border: filterType === type
+                      ? "none"
+                      : "1px solid #FF6B6B",
+                    cursor: "pointer",
+                    margin: "5px 8px",
+                    
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = "scale(1.1)";
+                    e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.3)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = "scale(1)";
+                    e.target.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+                  }}
                 >
-                  <span className="mr-2">{icon}</span>
+                  <span style={{ marginRight: "8px" }}>{icon}</span>
                   {label}
                 </button>
               )
             )}
           </div>
-          {selectedDomain && domainDetails.length > 0 ? (
-            renderBarChart()
-          ) : (
-            <p className="text-sm text-gray-600 text-center">
-              Select a domain to view details.
-            </p>
-          )}
-        </div>
+
+
+
+
+
+
+
+
+  {selectedDomain && domainDetails.length > 0 ? (
+    renderBarChart()
+  ) : (
+    <p className="text-sm text-gray-600 text-center">
+      Select a domain to view details.
+    </p>
+  )}
+</div>
+
       </div>
     </div>
   );

@@ -26,12 +26,12 @@ const SunburstChart = ({
       .scaleOrdinal()
       .domain(data.children.map((d) => d.name))
       .range([
-        '#9B59B6',
+        '#743089',
         '#2c7bb6',
         '#FF6B6B',
-        '#90eb9d',
-        '#ffff8c',
-        '#f9d057',
+        '#A865B5',
+        '#9E7BB5',
+        '#b6b5d8',
         '#f29e2e',
         '#e76818',
         '#d7191c',
@@ -119,9 +119,25 @@ const SunburstChart = ({
         .filter(function (d) {
           return +this.getAttribute("fill-opacity") || arcVisible(d.target);
         })
-        .attr("fill-opacity", (d) =>
-          arcVisible(d.target) ? (d.children ? 0.6 : 0.4) : 0
-        )
+        .attr("fill", (d) => {
+          if (d.parent && d.parent.data.name === "Job Market") {
+            // Assign specific colors for "Job Market" subcategories
+            if (d.data.name === "Top AI Startups") {
+              return "#8968CD"; // SUNSET PURPLE
+            } else if (d.data.name === "Salaries Trends") {
+              return "#CEA2FD"; // HEATHER
+            } else if (d.data.name === "AI Industries") {
+              return "#B6B5D8"; // EARLY BIRD
+            }
+          }
+        
+          // For all other nodes, use the original color logic
+          while (d.depth > 1) d = d.parent;
+          return color(d.data.name);
+        })
+        
+        
+        
         .attrTween("d", (d) => () => arc(d.current));
 
       label
@@ -140,6 +156,18 @@ const SunburstChart = ({
       .data(root.descendants().slice(1))
       .join("path")
       .attr("fill", (d) => {
+        // Apply specific colors to subcategories under "Job Market"
+        if (d.parent && d.parent.data.name === "Job Market") {
+          if (d.data.name === "Top AI Startups") {
+            return "#8968CD"; // SUNSET PURPLE
+          } else if (d.data.name === "Salaries Trends") {
+            return "#CEA2FD"; // HEATHER
+          } else if (d.data.name === "AI Industries") {
+            return "#B6B5D8"; // EARLY BIRD
+          }
+        }
+    
+        // Default color for all other nodes
         while (d.depth > 1) d = d.parent;
         return color(d.data.name);
       })

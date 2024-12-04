@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import rawData from '../data/4_AI_index_db.csv';
 
@@ -6,18 +6,20 @@ const Heatmap = () => {
   const svgRef = useRef();
   const scatterPlotRef = useRef();
   const containerRef = useRef();
+  const [showScatterPlot, setShowScatterPlot] = useState(false); // State to manage scatterplot visibility
+  
 
   useEffect(() => {
     const renderHeatmap = () => {
       const containerWidth = containerRef.current.offsetWidth * 0.8;
       const containerHeight = containerWidth * 0.6;
-      const margin = { top: 10, right: 30, bottom: 100, left: 125 };
+      const margin = { top: 10, right: 150, bottom: 100, left: 125 }; // Increased right margin for legend
       const width = containerWidth - margin.left - margin.right;
       const height = containerHeight - margin.top - margin.bottom;
-
+      
+    
       d3.select(svgRef.current).selectAll('*').remove();
-      d3.select(scatterPlotRef.current).selectAll('*').remove();
-
+    
       d3.csv(rawData).then(data => {
         const processedData = data.flatMap(d => [
           { metric: 'Talent', Region: d.Region, value: +d.Talent },
@@ -28,7 +30,7 @@ const Heatmap = () => {
           { metric: 'Government Strategy', Region: d.Region, value: +d['Government Strategy'] },
           { metric: 'Commercial', Region: d.Region, value: +d.Commercial },
         ]);
-
+    
         const metrics = [
           'Talent',
           'Infrastructure',
@@ -39,18 +41,18 @@ const Heatmap = () => {
           'Commercial',
         ];
         const regions = [...new Set(data.map(d => d.Region))];
-
+    
         const colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, 100]);
         const xScale = d3.scaleBand().domain(regions).range([0, width]).padding(0.1);
         const yScale = d3.scaleBand().domain(metrics).range([0, height]).padding(0.1);
-
+    
         const svg = d3
           .select(svgRef.current)
           .attr('width', width + margin.left + margin.right)
           .attr('height', height + margin.top + margin.bottom)
           .append('g')
           .attr('transform', `translate(${margin.left},${margin.top})`);
-
+    
         svg
           .selectAll('rect')
           .data(processedData)
@@ -60,13 +62,14 @@ const Heatmap = () => {
           .attr('width', xScale.bandwidth())
           .attr('height', yScale.bandwidth())
           .attr('fill', d => colorScale(d.value))
-          .style('cursor', d => (d.metric === 'Government Strategy' ? 'pointer' : 'default')) // Set pointer style
+          .style('cursor', d => (d.metric === 'Government Strategy' ? 'pointer' : 'default'))
           .on('click', (event, d) => {
             if (d.metric === 'Government Strategy') {
+              setShowScatterPlot(true); // Show scatterplot
               renderScatterPlot(d.Region);
             }
           });
-
+    
         svg
           .append('g')
           .attr('transform', `translate(0,${height})`)
@@ -74,35 +77,45 @@ const Heatmap = () => {
           .selectAll('text')
           .attr('transform', 'rotate(-45)')
           .style('text-anchor', 'end');
-
+    
         svg.append('g').call(d3.axisLeft(yScale));
-
-        // Heatmap Legend
-        const legendWidth = 150;
-        const legendHeight = 10;
-
-        const legendScale = d3.scaleLinear().domain([0, 100]).range([0, legendWidth]);
-
+    
+        // Heatmap Vertical Legend
+        const legendHeight = 150; // Legend height
+        const legendWidth = 10; // Legend width (narrow bar)
+    
+        const legendScale = d3.scaleLinear().domain([0, 100]).range([legendHeight, 0]); // Vertical scale
+    
         const legendGroup = svg
           .append('g')
-          .attr('transform', `translate(${width / 2 - legendWidth / 2}, ${height + 60})`);
-
+          .attr('transform', `translate(${width + 20}, ${height / 2 - legendHeight / 2})`); // Centered vertically on the right
+    
+        // Gradient bar
         legendGroup
           .append('rect')
           .attr('x', 0)
-          .attr('y', -legendHeight)
+          .attr('y', 0)
           .attr('width', legendWidth)
           .attr('height', legendHeight)
           .style('fill', 'url(#gradient)');
-
+    
+        // Gradient definition
         const defs = svg.append('defs');
-        const gradient = defs.append('linearGradient').attr('id', 'gradient');
-        gradient.append('stop').attr('offset', '0%').attr('stop-color', d3.interpolateBlues(0));
-        gradient.append('stop').attr('offset', '100%').attr('stop-color', d3.interpolateBlues(1));
-
-        legendGroup.append('g').call(d3.axisBottom(legendScale).ticks(5));
+        const gradient = defs.append('linearGradient')
+          .attr('id', 'gradient')
+          .attr('gradientTransform', 'rotate(90)'); // Rotates the gradient vertically
+        gradient.append('stop').attr('offset', '0%').attr('stop-color', d3.interpolateBlues(1)); // Top color
+        gradient.append('stop').attr('offset', '100%').attr('stop-color', d3.interpolateBlues(0)); // Bottom color
+    
+        // Legend axis
+        legendGroup
+          .append('g')
+          .call(d3.axisRight(legendScale).ticks(5)) // Vertical axis
+          .attr('transform', `translate(${legendWidth}, 0)`); // Move axis to the right of the bar
       });
     };
+    
+    
 
     const renderScatterPlot = (region) => {
       const containerWidth = containerRef.current.offsetWidth * 0.9;
@@ -130,9 +143,9 @@ const Heatmap = () => {
           .domain(politicalRegimes)
           .range([
             d3.symbolCircle,
-            d3.symbolSquare,
             d3.symbolTriangle,
             d3.symbolDiamond,
+            d3.symbolSquare,
             d3.symbolCross,
             d3.symbolStar
           ]);
@@ -156,16 +169,39 @@ const Heatmap = () => {
           .attr('y2', d => yScale(d))
           .attr('stroke', '#ccc')
           .attr('stroke-dasharray', '2 2');
+        svg.append('g')
+  .attr('class', 'grid')
+  .selectAll('line')
+  .data(xScale.domain())
+  .join('line')
+  .attr('x1', d => xScale(d) + xScale.bandwidth() / 2)
+  .attr('x2', d => xScale(d) + xScale.bandwidth() / 2)
+  .attr('y1', 0)
+  .attr('y2', height)
+  .attr('stroke', '#ccc')
+  .attr('stroke-dasharray', '2 2');
+
     
-        // Draw shapes
-        svg.selectAll('path')
+        // Draw shapes with animation
+        const shapes = svg.selectAll('path')
           .data(regionData)
           .join('path')
           .attr('d', d => d3.symbol().type(shapeScale(d['Political regime']))())
           .attr('transform', d => 
             `translate(${xScale(d.Country) + xScale.bandwidth() / 2},${yScale(+d['Government Strategy'])})`
           )
+          .attr('opacity', 0) // Initially hidden
           .attr('fill', 'steelblue');
+    
+        // Sequentially animate shapes
+        politicalRegimes.forEach((regime, i) => {
+          shapes
+            .filter(d => d['Political regime'] === regime)
+            .transition()
+            .delay(i * 1200) // Delay based on the regime order
+            .duration(500) // Animation duration for each group
+            .attr('opacity', 1); // Fade-in effect
+        });
     
         svg
           .append('g')
@@ -198,6 +234,7 @@ const Heatmap = () => {
     };
     
     
+    
 
     renderHeatmap();
 
@@ -210,9 +247,25 @@ const Heatmap = () => {
       <div style={{ marginBottom: '20px' }}>
         <svg ref={svgRef}></svg>
       </div>
-      <div>
-        <svg ref={scatterPlotRef}></svg>
-      </div>
+      {showScatterPlot && (
+        <div>
+          <svg ref={scatterPlotRef}></svg>
+          <button
+            onClick={() => setShowScatterPlot(false)} // Reset scatterplot view
+            style={{
+              marginTop: '10px',
+              padding: '5px 10px',
+              backgroundColor: '#3281bd',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            Reset
+          </button>
+        </div>
+      )}
     </div>
   );
 };
