@@ -49,7 +49,7 @@ const BubbleChart = () => {
             );
             return isNaN(computationValue) ? 0 : computationValue;
           }),
-        })).filter((d) => d.value > 0); // Exclude entities with value 0.0
+        })).filter((d) => d.value >= 0.1); // Exclude entities with value 0.0
 
         details.sort((a, b) => b.value - a.value);
         setDomainDetails(details);
@@ -70,24 +70,24 @@ const BubbleChart = () => {
 
   const renderBarChart = () => {
     if (domainDetails.length === 0) return null;
-
+  
     const limit = parseInt(filterType.match(/\d+/)[0], 10);
     const type = filterType.startsWith("top") ? "top" : "least";
-
+  
     const filteredData =
       type === "top"
         ? domainDetails.slice(0, limit)
         : domainDetails.slice(-limit).reverse();
-
+  
     const barWidth = width / 2 - 180; // Increased space for labels
     const barHeight = 24;
     const chartHeight = filteredData.length * (barHeight + 8);
-
+  
     const xScale = d3
       .scaleLinear()
       .domain([0, d3.max(filteredData, (d) => d.value)])
       .range([0, barWidth]);
-
+  
     return (
       <svg width={width / 2} height={chartHeight} className="mx-auto">
         {filteredData.map((d, i) => (
@@ -104,7 +104,10 @@ const BubbleChart = () => {
               fill="#FF6B6B"
               rx="2"
               className="transition-all duration-200"
-            />
+            >
+              {/* Add a title element for the tooltip */}
+              <title>{`${d.entity}: ${formatValue(d.value)} petaFLOP`}</title>
+            </rect>
             <text
               x={-10} // Increased space
               y={barHeight / 2}
@@ -124,21 +127,12 @@ const BubbleChart = () => {
                 ? `${d.entity.substring(0, 15)}...` // Truncate long labels
                 : d.entity}
             </text>
-            <text
-              x={xScale(d.value) + 8}
-              y={barHeight / 2}
-              alignmentBaseline="middle"
-              fill="#FF6B6B"
-              fontSize="12px"
-              className="font-medium"
-            >
-              {formatValue(d.value)}
-            </text>
           </g>
         ))}
       </svg>
     );
   };
+  
 
   if (data.length === 0) {
     return (

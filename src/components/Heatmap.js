@@ -60,6 +60,7 @@ const Heatmap = () => {
           .attr('width', xScale.bandwidth())
           .attr('height', yScale.bandwidth())
           .attr('fill', d => colorScale(d.value))
+          .style('cursor', d => (d.metric === 'Government Strategy' ? 'pointer' : 'default')) // Set pointer style
           .on('click', (event, d) => {
             if (d.metric === 'Government Strategy') {
               renderScatterPlot(d.Region);
@@ -106,7 +107,7 @@ const Heatmap = () => {
     const renderScatterPlot = (region) => {
       const containerWidth = containerRef.current.offsetWidth * 0.9;
       const containerHeight = containerWidth * 0.4;
-      const margin = { top: 20, right: 30, bottom: 100, left: 50 };
+      const margin = { top: 20, right: 150, bottom: 100, left: 50 }; // Increased right margin for legend
       const width = containerWidth - margin.left - margin.right;
       const height = containerHeight - margin.top - margin.bottom;
     
@@ -177,7 +178,7 @@ const Heatmap = () => {
         svg.append('g').call(d3.axisLeft(yScale));
     
         // Scatter Plot Legend
-        const legend = svg.append('g').attr('transform', `translate(${width - 100},${20})`);
+        const legend = svg.append('g').attr('transform', `translate(${width + 20}, 20)`);
     
         politicalRegimes.forEach((regime, i) => {
           legend
@@ -195,6 +196,7 @@ const Heatmap = () => {
         });
       });
     };
+    
     
 
     renderHeatmap();
