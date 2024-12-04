@@ -93,8 +93,29 @@ function App() {
           </button>
 
           <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-            <a href="#home">Home</a>
-            <a href="#analysis">Analysis</a>
+          <a
+  href="#home"
+  onClick={(e) => {
+    e.preventDefault();
+    document.documentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }}
+>
+  Home
+</a>
+
+<a
+  href="#analysis"
+  onClick={(e) => {
+    e.preventDefault();
+    const element = document.getElementById('analysis');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }}
+>
+  Sunburst Chart
+</a>
+
             <a href="#insights">Insights</a>
             <a href="#contact">Contact</a>
           </div>
@@ -148,7 +169,7 @@ function App() {
         </section>
       </main>
 
-      <footer className="footer">
+      <footer className="footer" id="contact">
         <div className="footer-content">
           <div className="footer-section">
             <h3>Course Information</h3>
