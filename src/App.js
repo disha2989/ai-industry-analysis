@@ -65,6 +65,18 @@ function App() {
       }, 100);
     }
   };
+  const handleRegionSpecificMetricsClick = () => {
+    console.log("Navigating to Heatmap section");
+    const element = document.getElementById('globe');
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  };
+  
+  
 
   return (
     <div className="app">
@@ -100,7 +112,7 @@ function App() {
         <section className="section" id="analysis">
           <div className="section-content">
             <div className="chart-container">
-              <SunburstChart data={data} onRegionClick={handleRegionClick} />
+              <SunburstChart data={data} onRegionClick={handleRegionClick} onRegionSpecificMetricsClick={handleRegionSpecificMetricsClick} />
             </div>
           </div>
         </section>

@@ -7,7 +7,7 @@
 
 /* Base Styles */
 :root {
-  --primary-color: #2563eb;
+  --primary-color: #000504;
   --secondary-color: #1e40af;
   --text-color: #1f2937;
   --background-color: #f8e4e4;
@@ -139,7 +139,7 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 2rem;
   margin: 2rem auto;
-  max-width: 90%;
+  max-width: 95%;
   transition: var(--transition);
 }
 
@@ -290,9 +290,7 @@ body {
   pointer-events: none;
 }
 
-circle:hover {
-  transform: scale(1.5);
-}
+
 
 text {
   font-family: "Arial, sans-serif";

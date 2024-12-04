@@ -31,6 +31,7 @@ const BubbleChart = () => {
         setData([]);
       });
   }, []);
+  
 
   const handleDomainClick = (domain) => {
     setSelectedDomain(domain);
@@ -70,7 +71,6 @@ const BubbleChart = () => {
   const renderBarChart = () => {
     if (domainDetails.length === 0) return null;
 
-    // Determine filter limits
     const limit = parseInt(filterType.match(/\d+/)[0], 10);
     const type = filterType.startsWith("top") ? "top" : "least";
 
@@ -79,9 +79,9 @@ const BubbleChart = () => {
         ? domainDetails.slice(0, limit)
         : domainDetails.slice(-limit).reverse();
 
-        const barWidth = width / 2 - 140; // Increased left margin for longer text
-        const barHeight = 24; // Increased bar height
-        const chartHeight = filteredData.length * (barHeight + 8); // Increased spacing
+    const barWidth = width / 2 - 180; // Increased space for labels
+    const barHeight = 24;
+    const chartHeight = filteredData.length * (barHeight + 8);
 
     const xScale = d3
       .scaleLinear()
@@ -93,7 +93,7 @@ const BubbleChart = () => {
         {filteredData.map((d, i) => (
           <g
             key={i}
-            transform={`translate(120, ${i * (barHeight + 8) + 8})`}
+            transform={`translate(160, ${i * (barHeight + 8) + 8})`} // Adjusted left margin
             className="transition-all duration-200 hover:opacity-80"
           >
             <rect
@@ -101,32 +101,35 @@ const BubbleChart = () => {
               y="0"
               width={xScale(d.value)}
               height={barHeight}
-              fill="#4ECDC4"
+              fill="#FF6B6B"
               rx="2"
               className="transition-all duration-200"
             />
             <text
-              x={-8}
+              x={-10} // Increased space
               y={barHeight / 2}
               textAnchor="end"
               alignmentBaseline="middle"
-              fill="#333"
-              fontSize="13px"
+              fill="#FF6B6B"
+              fontSize="12px"
               className="font-medium"
               style={{
-                maxWidth: "110px",
                 overflow: "hidden",
-                textOverflow: "ellipsis"
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                maxWidth: "140px", // Adjusted maxWidth
               }}
             >
-              {d.entity}
+              {d.entity.length > 15
+                ? `${d.entity.substring(0, 15)}...` // Truncate long labels
+                : d.entity}
             </text>
             <text
               x={xScale(d.value) + 8}
               y={barHeight / 2}
               alignmentBaseline="middle"
-              fill="#666"
-              fontSize="13px"
+              fill="#FF6B6B"
+              fontSize="12px"
               className="font-medium"
             >
               {formatValue(d.value)}
@@ -157,19 +160,7 @@ const BubbleChart = () => {
 
   const root = pack(hierarchy);
 
-  const color = d3
-    .scaleOrdinal()
-    .domain(data.map((d) => d.domain))
-    .range([
-      "#FF6B6B",
-      "#4ECDC4",
-      "#45B7D1",
-      "#96CEB4",
-      "#FFEEAD",
-      "#D4A5A5",
-      "#9B59B6",
-      "#3498DB",
-    ]);
+  
 
   return (
     <div className="w-full max-w-5xl mx-auto p-4">
@@ -196,27 +187,27 @@ const BubbleChart = () => {
                     className="cursor-pointer transition-all duration-200"
                   >
                     <circle
-  r={leaf.r}
-  fill={color(leaf.data.domain)} // Dynamic colors
-  opacity={hoveredDomain === null || hoveredDomain === leaf.data.domain ? 0.8 : 0.3} // Highlight hover
-  stroke="#fff" // White border
-  strokeWidth="1.5"
-  style={{ cursor: "pointer", transition: "opacity 0.3s, transform 0.2s" }}
-  onMouseEnter={() => setHoveredDomain(leaf.data.domain)}
-  onMouseLeave={() => setHoveredDomain(null)}
-  onClick={() => handleDomainClick(leaf.data.domain)}
->
-  <title>{`${leaf.data.domain}: ${formatValue(leaf.data.value)} petaFLOP`}</title>
-</circle>
-
-
+                      r={leaf.r}
+                      fill="#FF6B6B"
+                      opacity={
+                        hoveredDomain === null || hoveredDomain === leaf.data.domain
+                          ? 0.8
+                          : 0.3
+                      }
+                      stroke="#fff"
+                      strokeWidth="1.5"
+                      style={{ cursor: "pointer", transition: "opacity 0.3s" }}
+                    >
+                      <title>{`${leaf.data.domain}: ${formatValue(
+                        leaf.data.value
+                      )} petaFLOP`}</title>
+                    </circle>
                     {leaf.r > 30 && (
                       <>
                         <text
                           textAnchor="middle"
                           dy="-0.5em"
                           fill="#333"
-                          className="pointer-events-none font-semibold"
                           style={{ fontSize: Math.min(leaf.r / 4, 16) }}
                         >
                           {leaf.data.domain}
@@ -225,7 +216,6 @@ const BubbleChart = () => {
                           textAnchor="middle"
                           dy="1em"
                           fill="#666"
-                          className="pointer-events-none"
                           style={{ fontSize: Math.min(leaf.r / 5, 14) }}
                         >
                           {formatValue(leaf.data.value)}
@@ -246,32 +236,35 @@ const BubbleChart = () => {
               ? `Entity Contributions in ${selectedDomain}`
               : "Click a Domain"}
           </h2>
-          <div className="flex flex-wrap justify-center gap-2 mb-4">
-  {["top5", "least5"].map((type) => (
-    <button
-      key={type}
-      className={`px-6 py-2 rounded-full font-medium text-sm transition-all duration-200 transform hover:scale-105 ${
-                  filterType === type
-                    ? "bg-blue-500 text-white shadow-md hover:bg-blue-600"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-      onClick={() => setFilterType(type)}
-    >
-      {type.replace(/(\d+)/, " $1").replace("top", "Top").replace("least", "Least")}
-    </button>
-  ))}
-</div>
-              {selectedDomain && domainDetails.length > 0 ? (
-                renderBarChart()
-              ) : (
-                <p className="text-sm text-gray-600 text-center">
-                  Select a domain to view details.
-                </p>
-              )}
-            </div>
+          <div className="flex justify-center gap-3 mb-4">
+            {[{ type: "top5", label: "Top 5", icon: "⬆️" }, { type: "least5", label: "Least 5", icon: "⬇️" }].map(
+              ({ type, label, icon }) => (
+                <button
+                  key={type}
+                  className={`flex items-center px-4 py-2 rounded-lg font-medium text-base transition-all duration-200 transform hover:scale-105 shadow-sm focus:outline-none ${
+                    filterType === type
+                      ? "bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-300"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-gray-300"
+                  }`}
+                  onClick={() => setFilterType(type)}
+                >
+                  <span className="mr-2">{icon}</span>
+                  {label}
+                </button>
+              )
+            )}
           </div>
+          {selectedDomain && domainDetails.length > 0 ? (
+            renderBarChart()
+          ) : (
+            <p className="text-sm text-gray-600 text-center">
+              Select a domain to view details.
+            </p>
+          )}
         </div>
-      );
-    };
-    
-    export default BubbleChart;
+      </div>
+    </div>
+  );
+};
+
+export default BubbleChart;

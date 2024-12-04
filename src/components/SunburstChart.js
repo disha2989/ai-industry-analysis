@@ -1,7 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const SunburstChart = ({ data, onRegionClick, title = "Industry Overview", description = "Discover how AI is transforming different sectors through our interactive visualizations. Click on segments to zoom in and explore details." }) => {
+const SunburstChart = ({
+  data,
+  onRegionClick,
+  onRegionSpecificMetricsClick,
+  title = "Industry Overview",
+  description = "Discover how AI is transforming different sectors through our interactive visualizations. Click on segments to zoom in and explore details.",
+}) => {
   const svgRef = useRef();
 
   useEffect(() => {
@@ -16,121 +22,149 @@ const SunburstChart = ({ data, onRegionClick, title = "Industry Overview", descr
     const radius = width / 2.2;
 
     // Create the color scale
-    const color = d3.scaleOrdinal()
-      .domain(data.children.map(d => d.name))
+    const color = d3
+      .scaleOrdinal()
+      .domain(data.children.map((d) => d.name))
       .range([
-        '#2c7bb6', '#00a6ca', '#00ccbc', '#90eb9d', '#ffff8c',
-        '#f9d057', '#f29e2e', '#e76818', '#d7191c'
+        '#9B59B6',
+        '#2c7bb6',
+        '#FF6B6B',
+        '#90eb9d',
+        '#ffff8c',
+        '#f9d057',
+        '#f29e2e',
+        '#e76818',
+        '#d7191c',
       ]);
 
     // Create partition layout
-    const partition = data => {
-      const root = d3.hierarchy(data)
-        .sum(d => d.value)
+    const partition = (data) => {
+      const root = d3
+        .hierarchy(data)
+        .sum((d) => d.value)
         .sort((a, b) => b.value - a.value);
-      return d3.partition()
-        .size([2 * Math.PI, root.height + 1])
-        (root);
+      return d3
+        .partition()
+        .size([2 * Math.PI, root.height + 1])(root);
     };
 
     const root = partition(data);
-    root.each(d => d.current = d);
+    root.each((d) => (d.current = d));
 
     // Create arc generator
-    const arc = d3.arc()
-      .startAngle(d => d.x0)
-      .endAngle(d => d.x1)
-      .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.005))
+    const arc = d3
+      .arc()
+      .startAngle((d) => d.x0)
+      .endAngle((d) => d.x1)
+      .padAngle((d) => Math.min((d.x1 - d.x0) / 2, 0.005))
       .padRadius(radius * 1.5)
-      .innerRadius(d => d.y0 * radius / 3)
-      .outerRadius(d => Math.max(d.y0 * radius / 3, d.y1 * radius / 3 - 1))
+      .innerRadius((d) => (d.y0 * radius) / 3)
+      .outerRadius((d) => Math.max((d.y0 * radius) / 3, (d.y1 * radius) / 3 - 1))
       .cornerRadius(2);
 
     // Create SVG
-    const svg = d3.select(svgRef.current)
+    const svg = d3
+      .select(svgRef.current)
       .attr("viewBox", [-width / 2, -height / 2, width, width])
       .style("font", "12px Inter, sans-serif")
       .style("background", "transparent");
 
     // Create tooltip
-    const tooltip = d3.select("body")
+    const tooltip = d3
+      .select("body")
       .append("div")
       .attr("class", "chart-tooltip")
       .style("opacity", 0);
 
     // Function to handle clicks
     function clicked(event, p) {
-      console.log('Clicked node:', p.data.name);
-      console.log('Parent node:', p.parent ? p.parent.data.name : 'none');
-
-      if (p.data.name === "Regions" && p.parent && p.parent.data.name === "AI Development Costs") {
-        console.log('Regions section clicked, calling onRegionClick');
+      if (
+        p.data.name === "Regions" &&
+        p.parent &&
+        p.parent.data.name === "AI Development Costs"
+      ) {
         event.stopPropagation();
         onRegionClick();
+        return;
+      } else if (
+        p.data.name === "Region Specific Metrics" &&
+        p.parent &&
+        p.parent.data.name === "AI Global Index"
+      ) {
+        event.stopPropagation();
+        onRegionSpecificMetricsClick();
         return;
       }
 
       parent.datum(p.parent || root);
 
-      root.each(d => d.target = {
-        x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-        x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
-        y0: Math.max(0, d.y0 - p.depth),
-        y1: Math.max(0, d.y1 - p.depth)
-      });
+      root.each(
+        (d) =>
+          (d.target = {
+            x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+            x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) * 2 * Math.PI,
+            y0: Math.max(0, d.y0 - p.depth),
+            y1: Math.max(0, d.y1 - p.depth),
+          })
+      );
 
-      const t = svg.transition().duration(750)
-        .ease(d3.easeQuadInOut);
+      const t = svg.transition().duration(750).ease(d3.easeQuadInOut);
 
-      path.transition(t)
-        .tween("data", d => {
+      path
+        .transition(t)
+        .tween("data", (d) => {
           const i = d3.interpolate(d.current, d.target);
-          return t => d.current = i(t);
+          return (t) => (d.current = i(t));
         })
-        .filter(function(d) {
+        .filter(function (d) {
           return +this.getAttribute("fill-opacity") || arcVisible(d.target);
         })
-        .attr("fill-opacity", d => arcVisible(d.target) ? (d.children ? 0.6 : 0.4) : 0)
-        .attrTween("d", d => () => arc(d.current));
+        .attr("fill-opacity", (d) =>
+          arcVisible(d.target) ? (d.children ? 0.6 : 0.4) : 0
+        )
+        .attrTween("d", (d) => () => arc(d.current));
 
-      label.filter(function(d) {
-        return +this.getAttribute("fill-opacity") || labelVisible(d.target);
-      }).transition(t)
-        .attr("fill-opacity", d => +labelVisible(d.target))
-        .attrTween("transform", d => () => labelTransform(d.current));
+      label
+        .filter(function (d) {
+          return +this.getAttribute("fill-opacity") || labelVisible(d.target);
+        })
+        .transition(t)
+        .attr("fill-opacity", (d) => +labelVisible(d.target))
+        .attrTween("transform", (d) => () => labelTransform(d.current));
     }
 
     // Create the paths (arcs)
-    const path = svg.append("g")
+    const path = svg
+      .append("g")
       .selectAll("path")
       .data(root.descendants().slice(1))
       .join("path")
-      .attr("fill", d => {
+      .attr("fill", (d) => {
         while (d.depth > 1) d = d.parent;
         return color(d.data.name);
       })
-      .attr("fill-opacity", d => arcVisible(d.current) ? (d.children ? 0.6 : 0.4) : 0)
-      .attr("d", d => arc(d.current))
+      .attr("fill-opacity", (d) =>
+        arcVisible(d.current) ? (d.children ? 0.6 : 0.4) : 0
+      )
+      .attr("d", (d) => arc(d.current))
       .style("cursor", "pointer")
       .on("click", clicked);
 
     path
       .on("mouseover", (event, d) => {
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-        tooltip.html(d.data.name)
-          .style("left", (event.pageX + 10) + "px")
-          .style("top", (event.pageY - 28) + "px");
+        tooltip.transition().duration(200).style("opacity", 0.9);
+        tooltip
+          .html(d.data.name)
+          .style("left", event.pageX + 10 + "px")
+          .style("top", event.pageY - 28 + "px");
       })
       .on("mouseout", () => {
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
+        tooltip.transition().duration(500).style("opacity", 0);
       });
 
     // Add labels
-    const label = svg.append("g")
+    const label = svg
+      .append("g")
       .attr("pointer-events", "none")
       .attr("text-anchor", "middle")
       .style("user-select", "none")
@@ -138,12 +172,13 @@ const SunburstChart = ({ data, onRegionClick, title = "Industry Overview", descr
       .data(root.descendants().slice(1))
       .join("text")
       .attr("dy", "0.35em")
-      .attr("fill-opacity", d => +labelVisible(d.current))
-      .attr("transform", d => labelTransform(d.current))
-      .text(d => d.data.name);
+      .attr("fill-opacity", (d) => +labelVisible(d.current))
+      .attr("transform", (d) => labelTransform(d.current))
+      .text((d) => d.data.name);
 
     // Add center circle
-    const parent = svg.append("circle")
+    const parent = svg
+      .append("circle")
       .datum(root)
       .attr("r", radius / 3)
       .attr("fill", "none")
@@ -159,7 +194,7 @@ const SunburstChart = ({ data, onRegionClick, title = "Industry Overview", descr
     }
 
     function labelTransform(d) {
-      const x = (d.x0 + d.x1) / 2 * 180 / Math.PI;
+      const x = ((d.x0 + d.x1) / 2) * 180 / Math.PI;
       const y = ((d.y0 + d.y1) / 2) * radius / 3;
       return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
     }
@@ -167,7 +202,7 @@ const SunburstChart = ({ data, onRegionClick, title = "Industry Overview", descr
     return () => {
       d3.select("body").selectAll(".chart-tooltip").remove();
     };
-  }, [data, onRegionClick]);
+  }, [data, onRegionClick, onRegionSpecificMetricsClick]);
 
   return (
     <div className="flex flex-col items-center space-y-4">
