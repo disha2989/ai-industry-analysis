@@ -181,6 +181,8 @@ const Heatmap = () => {
   .attr('stroke', '#ccc')
   .attr('stroke-dasharray', '2 2');
 
+  
+
     
         // Draw shapes with animation
         const shapes = svg.selectAll('path')
@@ -244,11 +246,27 @@ const Heatmap = () => {
 
   return (
     <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: '20px'}}>
+      <h2 className="text-2xl font-bold mb-2 text-center text-gray-800">
+        AI Regional Trends Heatmap
+      </h2>
+      <p className="text-sm text-gray-600 text-center mb-6" style={{ marginBottom: '50px' }}>
+        Explore how different regions perform across various AI metrics such as Talent, Research, Development, and Government Strategy. 
+        Click on "Government Strategy" to drill down into country-level analysis using a scatterplot.
+
+
+      </p>
         <svg ref={svgRef}></svg>
       </div>
       {showScatterPlot && (
         <div>
+          <h2 className="text-xl font-bold mb-2 text-center text-gray-800">
+          Country-Level AI Government Strategy Analysis
+        </h2>
+        <p className="text-sm text-gray-600 text-center mb-6" style={{ marginBottom: '20px' }}>
+          This scatterplot visualizes country-level performance in "Government Strategy" metrics, with shapes indicating the type of political regime. 
+          Use the "Reset" button to return to the Heatmap.
+        </p>
           <svg ref={scatterPlotRef}></svg>
           <button
             onClick={() => setShowScatterPlot(false)} // Reset scatterplot view

@@ -114,7 +114,7 @@ const BubbleChart = () => {
               textAnchor="end"
               alignmentBaseline="middle"
               fill="#FF6B6B"
-              fontSize="12px"
+              fontSize="10px"
               className="font-medium"
               style={{
                 overflow: "hidden",
@@ -165,7 +165,9 @@ const BubbleChart = () => {
             AI Domain Computation Distribution
           </h2>
           <p className="text-sm text-gray-600 text-center mb-6">
-            Bubble size represents total computation requirements in petaFLOPs
+          This Bubble Chart visualizes the total training computation requirements (in petaFLOPs) across various AI domains. 
+  Each bubble's size represents the computation demand for a domain, allowing you to identify the most resource-intensive 
+  areas in AI research. Click on a bubble to explore detailed contributions from individual entities within the selected domain. 
           </p>
 
           <div className="relative mb-6">
@@ -255,7 +257,7 @@ const BubbleChart = () => {
     <h2 className="text-xl font-bold mb-2 text-gray-800">
       {selectedDomain
         ? `Entity Contributions in ${selectedDomain}`
-        : "Click a Domain"}
+        : "Select a Domain to Explore Entity Contributions"}
     </h2>
     {selectedDomain && (
   <button

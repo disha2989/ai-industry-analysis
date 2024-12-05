@@ -162,10 +162,10 @@ function App() {
               ref={marketAnalysisRef} 
               style={{ scrollMarginTop: '100px' }}
             >
-              Market Analysis
+              Bubble Chart Insights
             </h2>
             <p className="section-description">
-              Detailed insights into AI industry trends and computations.
+              Detailed insights into AI industry trends.
             </p>
             <div className="chart-container">
               <BubbleChart />
@@ -177,7 +177,7 @@ function App() {
           <div className="section-content">
             <h2>Heatmap</h2>
             <p className="section-description">
-              Explore AI trends across regions with our interactive globe.
+            Explore regional performance across key AI metrics
             </p>
             <div className="chart-container">
               <Heatmap />
