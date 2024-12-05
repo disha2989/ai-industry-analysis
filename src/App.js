@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import SunburstChart from './components/SunburstChart';
 import BubbleChart from './components/BubbleChart';
 import Heatmap from './components/Heatmap';
+import SankeyChart from './components/SankeyChart';
+import SalaryDrillDown from './components/SalaryDrillDown';
 import './App.css';
 
 const data = {
@@ -49,6 +51,7 @@ function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const marketAnalysisRef = useRef(null);
 
+
   const handleRegionClick = () => {
     console.log("Region clicked, attempting to scroll"); // Debug log
     const element = document.getElementById('market-analysis-heading');
@@ -73,6 +76,20 @@ function App() {
         behavior: 'smooth',
         block: 'start',
       });
+    }
+  };
+  const handleNavigateToSalaryDrillDown = () => {
+    const element = document.getElementById('salary-drilldown');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+
+  const handleNavigateToSankey = () => {
+    const element = document.getElementById('sankey-chart');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
   
@@ -133,7 +150,7 @@ function App() {
         <section className="section" id="analysis">
           <div className="section-content">
             <div className="chart-container">
-              <SunburstChart data={data} onRegionClick={handleRegionClick} onRegionSpecificMetricsClick={handleRegionSpecificMetricsClick} />
+              <SunburstChart data={data} onRegionClick={handleRegionClick} onRegionSpecificMetricsClick={handleRegionSpecificMetricsClick} onNavigateToSalaryDrillDown={handleNavigateToSalaryDrillDown} onNavigateToSankey={handleNavigateToSankey} />
             </div>
           </div>
         </section>
@@ -165,7 +182,27 @@ function App() {
             <div className="chart-container">
               <Heatmap />
               </div>
+
+              <div className="chart-container mb-12" id="sankey-chart">
+              <SankeyChart 
+                title="AI Job Market Flow Analysis" 
+                description="Explore how AI jobs flow through different industries, locations, and adoption levels"
+              />
+            </div>
+
+
+              <div className="chart-container" id="salary-drilldown">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+                AI Role Salary Analysis
+              </h2>
+              <p className="text-sm text-gray-600 text-center mb-6">
+                Explore salary distributions and trends across different AI roles and experience levels
+              </p>
+              <SalaryDrillDown />
+            </div>
+
           </div>
+          
         </section>
       </main>
 

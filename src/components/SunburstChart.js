@@ -5,6 +5,8 @@ const SunburstChart = ({
   data,
   onRegionClick,
   onRegionSpecificMetricsClick,
+  onNavigateToSalaryDrillDown, // New prop for navigation
+  onNavigateToSankey, // New prop for Sankey navigation
   title = "Industry Overview",
   description = "Discover how AI is transforming different sectors through our interactive visualizations. Click on segments to zoom in and explore details.",
 }) => {
@@ -17,9 +19,10 @@ const SunburstChart = ({
     d3.select(svgRef.current).selectAll("*").remove();
 
     // Set up dimensions
-    const width = 928;
-    const height = width;
-    const radius = width / 2.2;
+    const width = 400; // Reduced width
+    const height = width; // Maintain square dimensions
+    const radius = width / 2.5; // Adjust radius proportionally
+
 
     // Create the color scale
     const color = d3
@@ -66,7 +69,7 @@ const SunburstChart = ({
     const svg = d3
       .select(svgRef.current)
       .attr("viewBox", [-width / 2, -height / 2, width, width])
-      .style("font", "12px Inter, sans-serif")
+      .style("font", "2px Inter, sans-serif") // Adjust font size for smaller chart
       .style("background", "transparent");
 
     // Create tooltip
@@ -78,7 +81,15 @@ const SunburstChart = ({
 
     // Function to handle clicks
     function clicked(event, p) {
-      if (
+      if (p.data.name === "Salaries Trends") {
+        event.stopPropagation();
+        onNavigateToSalaryDrillDown(); // Navigate to Salary DrillDown
+        return;
+      } else if (p.data.name === "AI Industries") {
+        event.stopPropagation();
+        onNavigateToSankey(); // Navigate to Sankey chart
+        return;
+      } else if (
         p.data.name === "Regions" &&
         p.parent &&
         p.parent.data.name === "AI Development Costs"
@@ -230,7 +241,7 @@ const SunburstChart = ({
     return () => {
       d3.select("body").selectAll(".chart-tooltip").remove();
     };
-  }, [data, onRegionClick, onRegionSpecificMetricsClick]);
+  }, [data, onRegionClick, onRegionSpecificMetricsClick, onNavigateToSalaryDrillDown, onNavigateToSankey]);
 
   return (
     <div className="flex flex-col items-center space-y-4">
