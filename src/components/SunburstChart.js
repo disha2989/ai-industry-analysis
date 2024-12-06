@@ -86,7 +86,7 @@ const SunburstChart = ({
         event.stopPropagation();
         onNavigateToSalaryDrillDown();
         return;
-      } else if (p.data.name === "AI Industries") {
+      } else if (p.data.name === "Adoption risk") {
         event.stopPropagation();
         onNavigateToSankey();
         return;
@@ -95,7 +95,7 @@ const SunburstChart = ({
         onNavigateToAICompaniesDrilldown(); // Navigate to AI Companies Drilldown
         return;
       } else if (
-        p.data.name === "Regions" &&
+        p.data.name === "Domains" &&
         p.parent &&
         p.parent.data.name === "AI Development Costs"
       ) {

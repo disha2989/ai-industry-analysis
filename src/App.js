@@ -16,7 +16,7 @@ const data = {
       name: "Job Market",
       children: [
         {
-          name: "Adoption Risk",
+          name: "Top AI Startups",
           value: 100
         },
         {
@@ -24,7 +24,7 @@ const data = {
           value: 100
         },
         {
-          name: "AI Industries",
+          name: "Adoption risk",
           value: 100
         }
       ]
@@ -175,7 +175,7 @@ function App() {
              
             </h2>
             <p className="section-description">
-             
+              
             </p>
             <div className="chart-container">
               <BubbleChart />
@@ -185,7 +185,7 @@ function App() {
 
         <section className="section" id="globe">
           <div className="section-content">
-            <h2></h2>
+           
             <p className="section-description">
             
             </p>
