@@ -7,6 +7,7 @@ const SunburstChart = ({
   onRegionSpecificMetricsClick,
   onNavigateToSalaryDrillDown, // New prop for navigation
   onNavigateToSankey, // New prop for Sankey navigation
+  onNavigateToAICompaniesDrilldown, // New prop for AI Companies navigation
   title = "AI Industry Impact Across Sectors",
   description = " This Sunburst Chart offers an interactive overview of how AI is reshaping industries globally. Click on any sector to explore detailed trends, including job market shifts, AI adoption rates, and salary patterns across key regions and industries. To navigate back or zoom out, simply click the center of the chart.",
 }) => {
@@ -83,11 +84,15 @@ const SunburstChart = ({
     function clicked(event, p) {
       if (p.data.name === "Salaries Trends") {
         event.stopPropagation();
-        onNavigateToSalaryDrillDown(); // Navigate to Salary DrillDown
+        onNavigateToSalaryDrillDown();
         return;
       } else if (p.data.name === "AI Industries") {
         event.stopPropagation();
-        onNavigateToSankey(); // Navigate to Sankey chart
+        onNavigateToSankey();
+        return;
+      } else if (p.data.name === "Top AI Startups") {
+        event.stopPropagation();
+        onNavigateToAICompaniesDrilldown(); // Navigate to AI Companies Drilldown
         return;
       } else if (
         p.data.name === "Regions" &&
@@ -241,7 +246,7 @@ const SunburstChart = ({
     return () => {
       d3.select("body").selectAll(".chart-tooltip").remove();
     };
-  }, [data, onRegionClick, onRegionSpecificMetricsClick, onNavigateToSalaryDrillDown, onNavigateToSankey]);
+  }, [data, onRegionClick, onRegionSpecificMetricsClick, onNavigateToSalaryDrillDown, onNavigateToSankey, onNavigateToAICompaniesDrilldown]);
 
   return (
     <div className="flex flex-col items-center space-y-4">

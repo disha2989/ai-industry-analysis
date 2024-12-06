@@ -10,7 +10,7 @@
   --primary-color: #000504;
   --secondary-color: #1e40af;
   --text-color: #1f2937;
-  --background-color: #f8e4e4;
+  --background-color: linear-gradient(135deg, #c4778e, var(--secondary-color));
   --white: #ffffff;
   --transition: all 0.3s ease;
 }
@@ -83,7 +83,7 @@ body {
 /* Hero Section */
 .hero {
   padding: 8rem 1rem 4rem;
-  background: linear-gradient(135deg, #93193d, var(--secondary-color));
+  background:  #000000;
   color: var(--white);
   text-align: center;
 }
@@ -134,7 +134,7 @@ body {
 
 /* Chart Container */
 .chart-container {
-  background: var(--white);
+  background: #f8e9ee;;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 2rem;
@@ -150,7 +150,7 @@ body {
 
 /* Footer */
 .footer {
-  background: #1f2937;
+  background: #000000;
   color: var(--white);
   padding: 4rem 1rem 2rem;
 }

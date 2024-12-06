@@ -4,6 +4,9 @@ import BubbleChart from './components/BubbleChart';
 import Heatmap from './components/Heatmap';
 import SankeyChart from './components/SankeyChart';
 import SalaryDrillDown from './components/SalaryDrillDown';
+import AICompaniesDrilldown from './components/AICompaniesDrilldown';
+
+
 import './App.css';
 
 const data = {
@@ -13,7 +16,7 @@ const data = {
       name: "Job Market",
       children: [
         {
-          name: "Top AI Startups",
+          name: "Adoption Risk",
           value: 100
         },
         {
@@ -39,7 +42,7 @@ const data = {
       name: "AI Development Costs",
       children: [
         {
-          name: "Regions",
+          name: "Domains",
           value: 100
         }
       ]
@@ -93,6 +96,13 @@ function App() {
     }
   };
   
+
+  const handleNavigateToAICompaniesDrilldown = () => {
+    const element = document.getElementById('ai-companies-drilldown');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
   
 
   return (
@@ -150,7 +160,7 @@ function App() {
         <section className="section" id="analysis">
           <div className="section-content">
             <div className="chart-container">
-              <SunburstChart data={data} onRegionClick={handleRegionClick} onRegionSpecificMetricsClick={handleRegionSpecificMetricsClick} onNavigateToSalaryDrillDown={handleNavigateToSalaryDrillDown} onNavigateToSankey={handleNavigateToSankey} />
+              <SunburstChart data={data} onRegionClick={handleRegionClick} onRegionSpecificMetricsClick={handleRegionSpecificMetricsClick} onNavigateToSalaryDrillDown={handleNavigateToSalaryDrillDown} onNavigateToSankey={handleNavigateToSankey} onNavigateToAICompaniesDrilldown={handleNavigateToAICompaniesDrilldown}/>
             </div>
           </div>
         </section>
@@ -162,10 +172,10 @@ function App() {
               ref={marketAnalysisRef} 
               style={{ scrollMarginTop: '100px' }}
             >
-              Bubble Chart Insights
+             
             </h2>
             <p className="section-description">
-              Detailed insights into AI industry trends.
+             
             </p>
             <div className="chart-container">
               <BubbleChart />
@@ -175,9 +185,9 @@ function App() {
 
         <section className="section" id="globe">
           <div className="section-content">
-            <h2>Heatmap</h2>
+            <h2></h2>
             <p className="section-description">
-            Explore regional performance across key AI metrics
+            
             </p>
             <div className="chart-container">
               <Heatmap />
@@ -199,6 +209,17 @@ function App() {
                 Explore salary distributions and trends across different AI roles and experience levels
               </p>
               <SalaryDrillDown />
+            </div>
+
+
+            <div className="chart-container" id="ai-companies-drilldown">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
+                AI Companies Analysis Dashboard
+              </h2>
+              <p className="text-sm text-gray-600 text-center mb-6">
+                Interactive dashboard showing AI company distributions, focus areas, and regional analysis
+              </p>
+              <AICompaniesDrilldown />
             </div>
 
           </div>
