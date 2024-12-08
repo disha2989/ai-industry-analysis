@@ -262,7 +262,7 @@ const SankeyChart = () => {
           AI Job Market Flow Analysis
         </h2>
         <p className="text-sm text-gray-600 text-center mb-6">
-          Explore how AI jobs flow through different industries, locations, and adoption levels
+          Explore how AI jobs flow through different industries, locations, and adoption levels. Click on a industry for detailed analysis
         </p>
 
         {selectedIndustry ? (
@@ -271,7 +271,7 @@ const SankeyChart = () => {
               onClick={() => setSelectedIndustry(null)}
               className="mb-4 text-blue-600 hover:text-blue-800"
             >
-              ← Back to Overview
+              RESET
             </button>
             
             <h3 className="text-xl font-bold mb-4 text-center text-gray-800">

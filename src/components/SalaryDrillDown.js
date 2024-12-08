@@ -37,6 +37,13 @@ const SalaryDrillDown = () => {
       });
   }, []);
 
+  const StatCard = ({ title, value }) => (
+    <div className="bg-gray-50 rounded-lg p-4 text-center">
+      <h3 className="text-lg text-gray-600 mb-2">{title}</h3>
+      <p className="text-2xl font-bold">{value}</p>
+    </div>
+  );
+
   const ExperienceLevelOverview = () => {
     const expSummary = d3.rollup(data,
       v => ({
@@ -64,7 +71,7 @@ const SalaryDrillDown = () => {
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-3xl font-bold mb-2 text-center">AI Role Salary Analysis</h2>
         <p className="text-gray-600 mb-8 text-center">
-          Explore salary distributions and trends across different AI roles and experience levels
+          Salary trends across different experience levels
         </p>
         <div className="flex justify-center">
           <BarChart
@@ -72,12 +79,7 @@ const SalaryDrillDown = () => {
             width={900}
             height={400}
             data={chartData}
-            margin={{ 
-              top: 20, 
-              right: 120,
-              left: 120,
-              bottom: 20 
-            }}
+            margin={{ top: 20, right: 30, left: 120, bottom: 40 }}
             barGap={0}
             onClick={(data) => data && setSelectedExperience(data.activeLabel)}
           >
@@ -87,6 +89,12 @@ const SalaryDrillDown = () => {
               tickFormatter={(value) => `$${Math.round(value/1000)}K`}
               domain={[0, 240000]}
               ticks={[0, 65000, 130000, 185000, 240000]}
+              label={{
+                value: 'Salary in USD',
+                position: 'bottom',
+                offset: 0,
+                style: { textAnchor: 'middle' }
+              }}
             />
             <YAxis
               type="category"
@@ -97,6 +105,13 @@ const SalaryDrillDown = () => {
               tick={{ 
                 fontSize: 12,
                 fontWeight: 500
+              }}
+              label={{
+                value: 'Experience Levels',
+                angle: -90,
+                position: 'insideLeft',
+                offset: -90,
+                style: { textAnchor: 'middle' }
               }}
             />
             <Tooltip
@@ -115,15 +130,16 @@ const SalaryDrillDown = () => {
             </Bar>
           </BarChart>
         </div>
-        <div className="text-center mt-6 text-gray-600">
-          Click on any bar to see detailed analysis
-        </div>
       </div>
     );
   };
 
   const ExperienceDetail = ({ experienceLevel }) => {
     const experienceData = data.filter(d => d.experience_level === experienceLevel);
+    
+    // Calculate overall statistics for this experience level
+    const totalPositions = experienceData.length;
+    const averageSalary = d3.mean(experienceData, d => d.salary_in_usd);
 
     const jobData = d3.rollup(experienceData,
       v => ({
@@ -171,17 +187,10 @@ const SalaryDrillDown = () => {
 
     return (
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <button
-          onClick={() => setSelectedExperience(null)}
-          className="mb-4 text-purple-600 hover:text-purple-800"
-        >
-          ← Back to Overview
-        </button>
-        
         <h2 className="text-2xl font-bold mb-4 text-center">
           {experienceLevelNames[experienceLevel]} Salary Analysis
         </h2>
-        
+
         <div className="space-y-8">
           <div>
             <h3 className="text-lg font-semibold mb-4 text-center">Role Distribution Analysis</h3>
@@ -197,7 +206,7 @@ const SalaryDrillDown = () => {
                     name="Salary"
                     tickFormatter={(value) => `$${(value/1000).toFixed(0)}K`}
                     label={{ 
-                      value: 'Average Salary', 
+                      value: 'Salary in USD', 
                       position: 'bottom',
                       offset: 50
                     }}
@@ -265,7 +274,7 @@ const SalaryDrillDown = () => {
                 type="number"
                 tickFormatter={(value) => `$${value.toLocaleString()}`}
                 label={{ 
-                  value: 'Average Salary', 
+                  value: 'Salary in USD', 
                   angle: -90,
                   position: 'left',
                   offset: 10
@@ -274,53 +283,52 @@ const SalaryDrillDown = () => {
               <Tooltip
                 formatter={(value) => `$${value.toLocaleString()}`}
                 labelFormatter={(value) => companySizeNames[value]}
+                contentStyle={{ backgroundColor: 'white', borderRadius: '8px' }}
               />
-              <Bar 
+              <Bar
                 dataKey="avg_salary"
-                barSize={40}
                 fill={colors.companySize}
+                barSize={30}
               />
             </BarChart>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mt-8">
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Average Salary</div>
-              <div className="text-xl font-bold">
-                ${d3.mean(experienceData, d => d.salary_in_usd).toLocaleString()}
-              </div>
-            </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Total Positions</div>
-              <div className="text-xl font-bold">{experienceData.length}</div>
-            </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Salary Range</div>
-              <div className="text-xl font-bold">
-                ${d3.min(experienceData, d => d.salary_in_usd).toLocaleString()} - 
-                ${d3.max(experienceData, d => d.salary_in_usd).toLocaleString()}
-              </div>
-            </div>
+          {/* Summary Statistics Section */}
+          <div className="mt-8 grid grid-cols-2 gap-6">
+            <StatCard 
+              title="Total Positions" 
+              value={totalPositions.toLocaleString()}
+            />
+            <StatCard 
+              title="Average Salary" 
+              value={`$${Math.round(averageSalary).toLocaleString()}`}
+            />
+          </div>
+
+          <div className="text-center">
+            <button
+              onClick={() => setSelectedExperience(null)}
+              className="px-6 py-2 bg-gray-300 text-white font-semibold rounded-full"
+            >
+              Reset
+            </button>
           </div>
         </div>
       </div>
     );
   };
 
-  if (loading) {
-    return (
-      <div className="w-full h-60 flex items-center justify-center">
-        <div className="text-lg text-gray-600">Loading data...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      {selectedExperience ? 
-        <ExperienceDetail experienceLevel={selectedExperience} /> : 
-        <ExperienceLevelOverview />
-      }
+    <div className="container mx-auto p-6">
+      <div className="space-y-12">
+        {loading ? (
+          <p>Loading data...</p>
+        ) : selectedExperience ? (
+          <ExperienceDetail experienceLevel={selectedExperience} />
+        ) : (
+          <ExperienceLevelOverview />
+        )}
+      </div>
     </div>
   );
 };

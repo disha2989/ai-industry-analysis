@@ -99,20 +99,41 @@ const AICompaniesOverview = () => {
 
     return (
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-3xl font-bold mb-2 text-center">AI Companies Overview</h2>
-        <p className="text-gray-600 mb-8 text-center">
+        <h2 className="text-3xl font-bold mb-2 text-center">Top AI Companies Overview</h2>
+        <p className="text-lg text-gray-600 mb-8 text-center">
           Analysis of companies based on their AI service focus
         </p>
         <ResponsiveContainer width="100%" height={400}>
           <BarChart
             data={groupedData}
             layout="vertical"
-            margin={{ top: 20, right: 20, left: 50, bottom: 20 }}
+            margin={{ top: 20, right: 30, left: 50, bottom: 40 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" />
-            <YAxis type="category" dataKey="name" />
-            <Tooltip />
+            <XAxis 
+              type="number"
+              label={{ 
+                value: 'Number of Companies', 
+                position: 'bottom',
+                offset: 0,
+                dy: 25,
+                style: { fontSize: '16px' }
+              }}
+              style={{ fontSize: '14px' }}
+            />
+            <YAxis 
+              type="category" 
+              dataKey="name"
+              label={{ 
+                value: 'AI Service Focus Category', 
+                angle: -90,
+                position: 'insideLeft',
+                dx: -30,
+                style: { fontSize: '16px' }
+              }}
+              style={{ fontSize: '14px' }}
+            />
+            <Tooltip contentStyle={{ fontSize: '14px' }} />
             <Bar 
               dataKey="count" 
               fill={BAR_COLOR} 
@@ -121,9 +142,6 @@ const AICompaniesOverview = () => {
             />
           </BarChart>
         </ResponsiveContainer>
-        <div className="text-center mt-6 text-gray-600">
-          Click on any bar to see top companies and their hourly rates
-        </div>
       </div>
     );
   };
@@ -133,16 +151,9 @@ const AICompaniesOverview = () => {
     const { average, totalCompanies } = calculateCategoryAverage(category);
 
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <button
-          onClick={() => setSelectedCategory(null)}
-          className="mb-6 text-purple-600 hover:text-purple-800 flex items-center gap-2"
-        >
-          ← Back to Overview
-        </button>
-        
+      <div className="bg-white rounded-lg shadow-lg p-6 relative">
         <h2 className="text-2xl font-bold mb-6 text-center">
-          Top 5 Companies and their Avg Hourly Rates  {category}
+          Top 5 Startups and their Average Hourly Rates {category}
         </h2>
         
         <div className="max-w-4xl mx-auto">
@@ -155,16 +166,23 @@ const AICompaniesOverview = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 type="number"
-                label={{ value: 'Hourly Rate ($)', position: 'bottom' }}
+                label={{ 
+                  value: 'Hourly Rate ($)', 
+                  position: 'bottom',
+                  style: { fontSize: '16px' }
+                }}
+                style={{ fontSize: '14px' }}
                 domain={[0, 'dataMax + 20']}
               />
               <YAxis 
                 type="category" 
                 dataKey="name"
                 width={140}
+                style={{ fontSize: '14px' }}
               />
               <Tooltip 
                 formatter={(value) => [`$${value.toFixed(2)}/hr`, 'Hourly Rate']}
+                contentStyle={{ fontSize: '14px' }}
                 cursor={{ fill: 'rgba(155, 92, 209, 0.1)' }}
               />
               <Bar 
@@ -177,25 +195,30 @@ const AICompaniesOverview = () => {
 
           <div className="mt-6 p-4 bg-purple-50 rounded-lg">
             <div className="text-center">
-              <p className="text-gray-600 text-sm">Category Average Hourly Rate</p>
-              <p className="text-2xl font-bold text-purple-800">
+              <p className="text-gray-600 text-base">Category Average Hourly Rate</p>
+              <p className="text-3xl font-bold text-purple-800">
                 ${average.toFixed(2)}/hr
-              </p>
-              <p className="text-sm text-gray-600 mt-2">
               </p>
             </div>
           </div>
+
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className="absolute bottom-6 right-6 bg-indigo-300 hover:bg-indigo-400 text-black px-4 py-2 rounded flex items-center gap-2 text-lg"
+          >
+             RESET
+          </button>
         </div>
       </div>
     );
   };
 
   if (loading) {
-    return <div className="w-full h-60 flex items-center justify-center">Loading data...</div>;
+    return <div className="w-full h-60 flex items-center justify-center text-lg">Loading data...</div>;
   }
 
   if (error) {
-    return <div className="w-full h-60 flex items-center justify-center text-red-600">{error}</div>;
+    return <div className="w-full h-60 flex items-center justify-center text-red-600 text-lg">{error}</div>;
   }
 
   return (

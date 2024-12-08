@@ -196,28 +196,26 @@ function App() {
               <div className="chart-container mb-12" id="sankey-chart">
               <SankeyChart 
                 title="AI Job Market Flow Analysis" 
-                description="Explore how AI jobs flow through different industries, locations, and adoption levels"
+                description="Explore how AI jobs flow through different industries, locations, and adoption levels. Click on a industry for detailed analysis"
               />
             </div>
 
 
               <div className="chart-container" id="salary-drilldown">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-                AI Role Salary Analysis
-              </h2>
+              
               <p className="text-sm text-gray-600 text-center mb-6">
-                Explore salary distributions and trends across different AI roles and experience levels
+              To explore salary distributions and trends across different experience levels, AI roles and company size. 
+              Click on a bar for detailed analysis
               </p>
               <SalaryDrillDown />
             </div>
 
 
             <div className="chart-container" id="ai-companies-drilldown">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-                AI Companies Analysis Dashboard
-              </h2>
+             
               <p className="text-sm text-gray-600 text-center mb-6">
-                Interactive dashboard showing AI company distributions, focus areas, and regional analysis
+              To explore the distribution of AI startups, their AI service focus and average hourly rates <br />
+              Click on a bar for detailed analysis
               </p>
               <AICompaniesDrilldown />
             </div>
